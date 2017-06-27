@@ -4,7 +4,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 
 //GameScreen Class where the game is played
@@ -15,17 +17,27 @@ public class GameScreen implements Screen {
 	OrthographicCamera camera;
 	SpriteBatch batch;
 	Vector3 touch;
-	// Ball nBall, eBall, hBall;
-	Wall wall;
-	boolean gameOver;
-	public static int counter = 0;
 	String strCount;
-	BallEasy eBall;
-	BallNormal nBall;
-	BallHard hBall;
+	Wall wall;
+	Ball eBall;
+	Ball nBall;
+	Ball hBall;
 	Sound easyHit = Assets.easyHit;
 	Sound hit = Assets.hit;
 	Sound hardHit = Assets.hardHit;
+	boolean gameOver;
+	static int counter = 0;
+	final int ballX = 900;
+	final int ballY = 480;
+	final int eBallW = 150;
+	final Vector2 eBallA = new Vector2(0,-1);
+	final Sprite eBallI = Assets.sprite_ballEasy;
+	final int nBallW = 120;
+	final Vector2 nBallA = new Vector2(0,-1);
+	final Sprite nBallI = Assets.sprite_ball;
+	final int hBallW = 120;
+	final Vector2 hBallA = new Vector2(0,-2);
+	final Sprite hBallI = Assets.sprite_ballHard;
 
 	public GameScreen(MyGdxGame game) {
 		// Initialize all the variables used in this screen
@@ -41,13 +53,11 @@ public class GameScreen implements Screen {
 
 		touch = new Vector3();
 
-		game.highScoreNormal = Assets.settings.getInteger("High Score Normal");
+		nBall = new Ball(ballX, ballY, nBallW, nBallA, nBallI);
 
-		nBall = new BallNormal();
+		eBall = new Ball(ballX, ballY, eBallW, eBallA, eBallI);
 
-		eBall = new BallEasy();
-
-		hBall = new BallHard();
+		hBall = new Ball(ballX, ballY, hBallW, hBallA, hBallI);
 
 		wall = new Wall();
 
@@ -57,11 +67,7 @@ public class GameScreen implements Screen {
 
 		camera.update();
 
-		// Convert the counter variable into a string to write it on the screen
-		StringBuilder sb = new StringBuilder();
-		sb.append("");
-		sb.append(counter);
-		strCount = sb.toString();
+		strCount = intToStr(counter);
 
 		batch.setProjectionMatrix(camera.combined);
 
@@ -73,19 +79,20 @@ public class GameScreen implements Screen {
 
 		switch (game.difficulty) {
 		case 1:
-			batch.draw(eBall.image, eBall.bounds.x, eBall.bounds.y);
+			/*batch.draw(eBall.image, eBall.bounds.x, eBall.bounds.y);*/
+			eBall.draw(batch);
 			break;
 		case 2:
-			batch.draw(nBall.image, nBall.bounds.x, nBall.bounds.y);
+			nBall.draw(batch);
 			break;
 		case 3:
-			batch.draw(hBall.image, hBall.bounds.x, hBall.bounds.y);
+			hBall.draw(batch);
 			break;
 		}
 
-		batch.draw(wall.image, wall.bounds.x, wall.bounds.y); // draw wall
+		wall.draw(batch);
 
-		Assets.font.draw(batch, strCount, 960, 30); // draw counter
+		Assets.font.draw(batch, strCount, wall.bounds.width/2, wall.bounds.height/3); // draw counter
 
 		// set vector3 touch to the current click/touch location
 		touch.set(Gdx.input.getX(), Gdx.input.getY(), 0);
@@ -142,6 +149,30 @@ public class GameScreen implements Screen {
 		}
 		
 	}
+	
+	void gameScore(String strCount, int highScore, String strHS, String placeStr){
+		
+		Assets.font.draw(batch, "Your Score: " + strCount + "    High Score: " + strHS, 600, 500);
+		if (counter >= highScore) {
+
+			highScore = counter;
+			Assets.settings.putInteger(placeStr, highScore);
+			Assets.settings.flush(); // Saves file
+		}
+		
+		
+	}
+	
+	String intToStr(int num){
+		
+		String str;
+		StringBuilder sb = new StringBuilder();
+		sb.append("");
+		sb.append(num);
+		str = sb.toString();
+		return str;
+		
+	}
 
 	void gameIsOver() {
 
@@ -151,47 +182,20 @@ public class GameScreen implements Screen {
 		againBtn = new Button(1000, 635, 500, 150);
 		menuBtn = new Button(425, 635, 500, 150);
 
-		StringBuilder sb2 = new StringBuilder();
-		sb2.append("");
-		sb2.append(game.highScoreEasy);
-		String strHighScoreEasy = sb2.toString();
-
-		StringBuilder sb3 = new StringBuilder();
-		sb3.append("");
-		sb3.append(game.highScoreNormal);
-		String strHighScoreNormal = sb3.toString();
-
-		StringBuilder sb4 = new StringBuilder();
-		sb4.append("");
-		sb4.append(game.highScoreHard);
-		String strHighScoreHard = sb4.toString();
+		
+		String strHighScoreEasy = intToStr(game.highScoreEasy);
+		String strHighScoreNormal = intToStr(game.highScoreNormal);
+		String strHighScoreHard = intToStr(game.highScoreHard);
 
 		switch (game.difficulty) {
-		case 1:
-			Assets.font.draw(batch, "Your Score: " + strCount + "    High Score: " + strHighScoreEasy, 600, 500);
-			if (counter >= game.highScoreEasy) {
-
-				game.highScoreEasy = counter;
-				Assets.settings.putInteger("High Score Easy", game.highScoreEasy);
-				Assets.settings.flush(); // Saves file
-			}
+		case 1:	
+			gameScore(strCount, game.highScoreEasy, strHighScoreEasy, "High Score Easy");
 			break;
 		case 2:
-			Assets.font.draw(batch, "Your Score: " + strCount + "    High Score: " + strHighScoreNormal, 600, 500);
-
-			if (counter >= game.highScoreNormal) {
-				game.highScoreNormal = counter;
-				Assets.settings.putInteger("High Score Normal", game.highScoreNormal);
-				Assets.settings.flush();
-			}
+			gameScore(strCount, game.highScoreNormal, strHighScoreNormal,"High Score Normal");
 			break;
 		case 3:
-			Assets.font.draw(batch, "Your Score: " + strCount + "    High Score: " + strHighScoreHard, 600, 500);
-			if (counter >= game.highScoreHard) {
-				game.highScoreHard = counter;
-				Assets.settings.putInteger("High Score Hard", game.highScoreHard);
-				Assets.settings.flush();
-			}
+			gameScore(strCount, game.highScoreHard, strHighScoreHard,"High Score Hard");
 			break;
 		}
 

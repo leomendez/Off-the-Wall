@@ -23,6 +23,7 @@ public class MenuScreen implements Screen {
 		settingsBtn = new Button(btnX, btnY + btnH + btnGap, btnW, btnH);
 		aboutBtn = new Button(btnX, btnY + ((btnH + btnGap) * 2), btnW, btnH);
 		scoreBtn = new Button(scoreBtnX, scoreBtnY, scoreBtnW, scoreBtnW);
+		
 
 		// Resizing and scaling to screen
 		camera = new OrthographicCamera();
@@ -61,6 +62,7 @@ public class MenuScreen implements Screen {
 		batch.begin();
 
 		batch.draw(Assets.sprite_mainMenu, 0, 0);
+		
 
 		generalUpdate(touch, camera);
 

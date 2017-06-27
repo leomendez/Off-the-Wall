@@ -3,6 +3,7 @@ package com.leomenbel.offthewall;
 import java.util.Random;
 
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -31,6 +32,7 @@ public class Ball {
 	boolean isTouched(Vector3 touch) {
 
 		if (touch.x >= bounds.x && touch.x <= bounds.x + ballW && touch.y >= bounds.y && touch.y <= bounds.y + ballW) {
+			
 			return true;
 		} else {
 			return false;
@@ -60,13 +62,18 @@ public class Ball {
 
 	}
 	
+	void draw(SpriteBatch batch){
+		batch.draw(image, bounds.x, bounds.y);
+	}
+	
 	
 
 	void move() {
 		
 		position.add(velocity);
-		bounds.x = position.x;
-		bounds.y = position.y;
+		/*bounds.x = position.x;
+		bounds.y = position.y;*/
+		bounds.setPosition(position.x,position.y);
 
 	}
 	

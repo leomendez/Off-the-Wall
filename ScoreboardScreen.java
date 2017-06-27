@@ -41,20 +41,9 @@ public class ScoreboardScreen implements Screen {
 
 		generalUpdate(touch, camera);
 
-		StringBuilder sb1 = new StringBuilder();
-		sb1.append("");
-		sb1.append(game.highScoreEasy);
-		String strHighScoreEasy = sb1.toString();
-
-		StringBuilder sb2 = new StringBuilder();
-		sb2.append("");
-		sb2.append(game.highScoreNormal);
-		String strHighScoreNormal = sb2.toString();
-
-		StringBuilder sb3 = new StringBuilder();
-		sb3.append("");
-		sb3.append(game.highScoreHard);
-		String strHighScoreHard = sb3.toString();
+		String strHighScoreEasy = intToStr(game.highScoreEasy);
+		String strHighScoreNormal = intToStr(game.highScoreNormal);
+		String strHighScoreHard = intToStr(game.highScoreHard);
 
 		batch.begin();
 
@@ -94,6 +83,17 @@ public class ScoreboardScreen implements Screen {
 		}
 
 	}
+	
+	String intToStr(int num){
+			
+			String str;
+			StringBuilder sb = new StringBuilder();
+			sb.append("");
+			sb.append(num);
+			str = sb.toString();
+			return str;
+			
+		}
 
 	@Override
 	public void show() {
